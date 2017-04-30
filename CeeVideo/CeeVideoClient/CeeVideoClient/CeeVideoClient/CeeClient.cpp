@@ -1,10 +1,12 @@
 #define WIN32_LEAN_AND_MEAN
-
+//#include <opencv2\opencv.hpp>
 #include <windows.h>
 #include <winsock2.h>
+#include <opencv2\opencv.hpp>
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
+using namespace cv;
 
 // SET COMMAND LINE RUN OPTIONS WITH DEBUG->PROPERTIES->Under debugging -> command parameters
 

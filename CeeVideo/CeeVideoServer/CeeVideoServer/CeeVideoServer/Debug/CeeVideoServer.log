@@ -1,13 +1,16 @@
-﻿Build started 4/29/2017 8:47:50 PM.
+﻿Build started 4/29/2017 9:33:48 PM.
      1>Project "A:\CeeVideo\CeeVideo\CeeVideoServer\CeeVideoServer\CeeVideoServer\CeeVideoServer.vcxproj" on node 2 (Build target(s)).
-     1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt CeeServer.cpp
-         CeeServer.cpp
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"A:\CeeVideo\CeeVideo\CeeVideoServer\CeeVideoServer\Debug\CeeVideoServer.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"A:\CeeVideo\CeeVideo\CeeVideoServer\CeeVideoServer\Debug\CeeVideoServer.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"A:\CeeVideo\CeeVideo\CeeVideoServer\CeeVideoServer\Debug\CeeVideoServer.lib" /MACHINE:X86 Debug\CeeServer.obj
-         CeeVideoServer.vcxproj -> A:\CeeVideo\CeeVideo\CeeVideoServer\CeeVideoServer\Debug\CeeVideoServer.exe
-     1>Done Building Project "A:\CeeVideo\CeeVideo\CeeVideoServer\CeeVideoServer\CeeVideoServer\CeeVideoServer.vcxproj" (Build target(s)).
+     1>Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"A:\CeeVideo\CeeVideo\CeeVideoServer\CeeVideoServer\Debug\CeeVideoServer.exe" /INCREMENTAL /NOLOGO /LIBPATH:C:\Users\Anthony\Downloads\opencv\build\x64\vc14\lib opencv_world320.lib opencv_world320d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"A:\CeeVideo\CeeVideo\CeeVideoServer\CeeVideoServer\Debug\CeeVideoServer.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"A:\CeeVideo\CeeVideo\CeeVideoServer\CeeVideoServer\Debug\CeeVideoServer.lib" /MACHINE:X86 Debug\CeeServer.obj
+     1>CeeServer.obj : error LNK2019: unresolved external symbol "void __cdecl cv::fastFree(void *)" (?fastFree@cv@@YAXPAX@Z) referenced in function "public: __thiscall cv::Mat::~Mat(void)" (??1Mat@cv@@QAE@XZ)
+     1>CeeServer.obj : error LNK2019: unresolved external symbol "private: char * __thiscall cv::String::allocate(unsigned int)" (?allocate@String@cv@@AAEPADI@Z) referenced in function "public: __thiscall cv::String::String(char const *)" (??0String@cv@@QAE@PBD@Z)
+     1>CeeServer.obj : error LNK2019: unresolved external symbol "private: void __thiscall cv::String::deallocate(void)" (?deallocate@String@cv@@AAEXXZ) referenced in function "public: __thiscall cv::String::~String(void)" (??1String@cv@@QAE@XZ)
+     1>CeeServer.obj : error LNK2019: unresolved external symbol "public: void __thiscall cv::Mat::deallocate(void)" (?deallocate@Mat@cv@@QAEXXZ) referenced in function "public: void __thiscall cv::Mat::release(void)" (?release@Mat@cv@@QAEXXZ)
+     1>CeeServer.obj : error LNK2019: unresolved external symbol "void __cdecl cv::imshow(class cv::String const &,class cv::_InputArray const &)" (?imshow@cv@@YAXABVString@1@ABV_InputArray@1@@Z) referenced in function "void __cdecl play_video(class cv::Mat)" (?play_video@@YAXVMat@cv@@@Z)
+     1>CeeServer.obj : error LNK2019: unresolved external symbol _cvWaitKey referenced in function "void __cdecl play_video(class cv::Mat)" (?play_video@@YAXVMat@cv@@@Z)
+     1>A:\CeeVideo\CeeVideo\CeeVideoServer\CeeVideoServer\Debug\CeeVideoServer.exe : fatal error LNK1120: 6 unresolved externals
+     1>Done Building Project "A:\CeeVideo\CeeVideo\CeeVideoServer\CeeVideoServer\CeeVideoServer\CeeVideoServer.vcxproj" (Build target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:00.51
+Time Elapsed 00:00:00.15
