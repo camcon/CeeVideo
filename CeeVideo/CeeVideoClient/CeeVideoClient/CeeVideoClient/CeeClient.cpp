@@ -16,18 +16,75 @@ using namespace cv;
 #pragma comment (lib, "AdvApi32.lib")
 
 
-#define DEFAULT_BUFLEN 512
+#define DEFAULT_BUFLEN 46080
 #define DEFAULT_PORT "8080"
+Mat captureVideo(int, SOCKET, char*);
+void sendData(int, SOCKET, char*, Mat);
 
+void captureVideo(){
+	VideoCapture cap(0); // open the default camera
+	if (!cap.isOpened())  // check if we succeeded
+		printf("Failed");
+
+	Mat edges;
+	namedWindow("THIS IS A TEST", 1);
+	for (;;)
+	{
+		Mat frame;
+		cap >> frame; // get a new frame from camera
+		unsigned char* dataMat = frame.data;
+		printf("%d", frame.rows);
+		cvtColor(frame, edges, COLOR_BGR2GRAY);
+		GaussianBlur(edges, edges, Size(7, 7), 1.5, 1.5);
+		Canny(edges, edges, 0, 30, 3);
+		imshow("THIS IS A TEST", edges);
+
+		cvWaitKey(10);
+	}
+}
+
+Mat captureVideo(int iResult, SOCKET ConnectSocket, char *sendbuf){
+	VideoCapture cap(0); // open the default camera
+	if (!cap.isOpened())  // check if we succeeded
+		printf("Failed");
+
+	Mat edges;
+	unsigned char* dataMat;
+	//namedWindow("edges", 1);
+	for (;;)
+	{
+		Mat frame;
+		cap >> frame; // get a new frame from camera
+		dataMat = frame.data;
+		cvtColor(frame, edges, COLOR_BGR2GRAY);
+		GaussianBlur(edges, edges, Size(7, 7), 1.5, 1.5);
+		Canny(edges, edges, 0, 30, 3);
+
+		//char *sendbuf = const_cast<char *> (dataMat.toString().c_str());
+		sendData(iResult, ConnectSocket, (char*)dataMat, edges);
+	}
+}
+void sendData(int iResult, SOCKET ConnectSocket, char *sendbuf, Mat frame){
+	
+	//printf(sendbuf);
+	iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+	if (iResult == SOCKET_ERROR) {
+		printf("send failed with error: %d\n", WSAGetLastError());
+		closesocket(ConnectSocket);
+		WSACleanup();
+	}
+	//printf("Bytes Sent: %ld\n", iResult);
+}
 int __cdecl main(int argc, char **argv)
 {
-	printf("Hey it's a client");
+	printf("Hey it's a client\n");
+	//captureVideo();
 	WSADATA wsaData;
 	SOCKET ConnectSocket = INVALID_SOCKET;
 	struct addrinfo *result = NULL,
 		*ptr = NULL,
 		hints;
-	char *sendbuf = "this is a test";
+	char *sendbuf = "this is a test there is a poop";
 	char recvbuf[DEFAULT_BUFLEN];
 	int iResult;
 	int recvbuflen = DEFAULT_BUFLEN;
@@ -87,7 +144,8 @@ int __cdecl main(int argc, char **argv)
 		WSACleanup();
 		return 1;
 	}
-
+	captureVideo(iResult, ConnectSocket, sendbuf);
+	/*
 	// Send an initial buffer
 	iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
 	if (iResult == SOCKET_ERROR) {
@@ -96,9 +154,9 @@ int __cdecl main(int argc, char **argv)
 		WSACleanup();
 		return 1;
 	}
-
+	
 	printf("Bytes Sent: %ld\n", iResult);
-
+	*/
 	// shutdown the connection since no more data will be sent
 	iResult = shutdown(ConnectSocket, SD_SEND);
 	if (iResult == SOCKET_ERROR) {

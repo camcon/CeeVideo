@@ -11,7 +11,7 @@
 using namespace cv;
 
 // USING ENVIRONMENT VARIABLE "OPENCV_INC" POINTING TOWARDS THE C:\Users\Anthony\Downloads\opencv\build\include -- C++ GENERAL ADDITIONAL INCLUDE DIRECTORIES
-// USING ENVIRONMENT VARIABLE "OPENCV_LIB" POINTING TOWARDS THE C:\Users\Anthony\Downloads\opencv\build\include -- LINKER GENERAL ADDITIONAL LIBRARY DIRECTORIES
+// USING ENVIRONMENT VARIABLE "OPENCV_LIB" POINTING TOWARDS THE C:\Users\Anthony\Downloads\opencv\build\x64\vc14\lib -- LINKER GENERAL ADDITIONAL LIBRARY DIRECTORIES
 
 // ADDL DEPENDENCIES:  opencv_world320.lib;opencv_world320d.lib
 
@@ -19,24 +19,18 @@ using namespace cv;
 #pragma comment (lib, "Ws2_32.lib")
 // #pragma comment (lib, "Mswsock.lib")
 
-#define DEFAULT_BUFLEN 512
+#define DEFAULT_BUFLEN 46080
 #define DEFAULT_PORT "8080"
 
 void play_video(Mat frame){
-	imshow("frame", frame);
-	cvWaitKey(10);
+	imshow("Server Frame", frame);
+	cvWaitKey(100);
 }
-
-
-
-
-
-
 
 
 int __cdecl main(void)
 {
-	printf("Server starting");
+	printf("Server starting\n");
 	WSADATA wsaData;
 	int iResult;
 
@@ -48,6 +42,7 @@ int __cdecl main(void)
 
 	int iSendResult;
 	char recvbuf[DEFAULT_BUFLEN];
+	Mat recvFrame;
 	int recvbuflen = DEFAULT_BUFLEN;
 
 	// Initialize Winsock
@@ -111,11 +106,15 @@ int __cdecl main(void)
 
 	// No longer need server socket
 	closesocket(ListenSocket);
-
 	// Receive until the peer shuts down the connection
 	do {
 
 		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+		//printf(recvbuf);
+		recvFrame.data = (unsigned char*)recvbuf;
+		cv::Mat recvFrame(480, 640, CV_8UC1, recvbuf);
+		play_video(recvFrame);
+		//printf(recvbuf);
 		if (iResult > 0) {
 			printf("Bytes received: %d\n", iResult);
 
