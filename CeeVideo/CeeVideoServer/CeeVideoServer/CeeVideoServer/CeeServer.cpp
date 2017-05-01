@@ -19,12 +19,12 @@ using namespace cv;
 #pragma comment (lib, "Ws2_32.lib")
 // #pragma comment (lib, "Mswsock.lib")
 
-#define DEFAULT_BUFLEN 46080
+#define DEFAULT_BUFLEN 307200
 #define DEFAULT_PORT "8080"
 
 void play_video(Mat frame){
 	imshow("Server Frame", frame);
-	cvWaitKey(100);
+	cvWaitKey(10);
 }
 
 
@@ -42,7 +42,6 @@ int __cdecl main(void)
 
 	int iSendResult;
 	char recvbuf[DEFAULT_BUFLEN];
-	Mat recvFrame;
 	int recvbuflen = DEFAULT_BUFLEN;
 
 	// Initialize Winsock
@@ -104,21 +103,21 @@ int __cdecl main(void)
 		return 1;
 	}
 
-	// No longer need server socket
-	closesocket(ListenSocket);
-	// Receive until the peer shuts down the connection
-	do {
 
+	// Receive until the peer shuts down the connection
+	
+	do {
 		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-		//printf(recvbuf);
-		recvFrame.data = (unsigned char*)recvbuf;
-		cv::Mat recvFrame(480, 640, CV_8UC1, recvbuf);
-		play_video(recvFrame);
-		//printf(recvbuf);
+		unsigned char* dataMat = (unsigned char*)recvbuf;
+		
+		cv::Mat my_mat(480, 640, CV_8UC1, dataMat);
+		play_video(my_mat);
+		
 		if (iResult > 0) {
-			printf("Bytes received: %d\n", iResult);
+			//printf("Bytes received: %d\n", iResult);
 
 			// Echo the buffer back to the sender
+			/*
 			iSendResult = send(ClientSocket, recvbuf, iResult, 0);
 			if (iSendResult == SOCKET_ERROR) {
 				printf("send failed with error: %d\n", WSAGetLastError());
@@ -127,6 +126,7 @@ int __cdecl main(void)
 				return 1;
 			}
 			printf("Bytes sent: %d\n", iSendResult);
+			*/
 		}
 		else if (iResult == 0)
 			printf("Connection closing...\n");
@@ -147,7 +147,8 @@ int __cdecl main(void)
 		WSACleanup();
 		return 1;
 	}
-
+	// No longer need server socket
+	closesocket(ListenSocket);
 	// cleanup
 	closesocket(ClientSocket);
 	WSACleanup();

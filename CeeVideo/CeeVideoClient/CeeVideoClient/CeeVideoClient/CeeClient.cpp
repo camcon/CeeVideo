@@ -16,7 +16,7 @@ using namespace cv;
 #pragma comment (lib, "AdvApi32.lib")
 
 
-#define DEFAULT_BUFLEN 46080
+#define DEFAULT_BUFLEN 307200
 #define DEFAULT_PORT "8080"
 Mat captureVideo(int, SOCKET, char*);
 void sendData(int, SOCKET, char*, Mat);
@@ -55,13 +55,22 @@ Mat captureVideo(int iResult, SOCKET ConnectSocket, char *sendbuf){
 	{
 		Mat frame;
 		cap >> frame; // get a new frame from camera
+		frame = (frame.reshape(0, 1));
+		int imgSize = frame.total()*frame.elemSize();
 		dataMat = frame.data;
+		/*
 		cvtColor(frame, edges, COLOR_BGR2GRAY);
 		GaussianBlur(edges, edges, Size(7, 7), 1.5, 1.5);
 		Canny(edges, edges, 0, 30, 3);
-
+		*/
 		//char *sendbuf = const_cast<char *> (dataMat.toString().c_str());
-		sendData(iResult, ConnectSocket, (char*)dataMat, edges);
+		iResult = send(ConnectSocket, (char*)frame.data, imgSize, 0);
+		if (iResult == SOCKET_ERROR) {
+			printf("send failed with error: %d\n", WSAGetLastError());
+			closesocket(ConnectSocket);
+			WSACleanup();
+		}
+		//sendData(iResult, ConnectSocket, frame.data, edges);
 	}
 }
 void sendData(int iResult, SOCKET ConnectSocket, char *sendbuf, Mat frame){
@@ -145,6 +154,7 @@ int __cdecl main(int argc, char **argv)
 		return 1;
 	}
 	captureVideo(iResult, ConnectSocket, sendbuf);
+	//captureVideo();
 	/*
 	// Send an initial buffer
 	iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
