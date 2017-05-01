@@ -6,6 +6,7 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
+
 using namespace cv;
 
 // SET COMMAND LINE RUN OPTIONS WITH DEBUG->PROPERTIES->Under debugging -> command parameters
@@ -21,6 +22,29 @@ using namespace cv;
 Mat captureVideo(int, SOCKET, char*);
 void sendData(int, SOCKET, char*, Mat);
 
+String type2str(int type) {
+	String r;
+
+	uchar depth = type & CV_MAT_DEPTH_MASK;
+	uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+	switch (depth) {
+	case CV_8U:  r = "8U"; break;
+	case CV_8S:  r = "8S"; break;
+	case CV_16U: r = "16U"; break;
+	case CV_16S: r = "16S"; break;
+	case CV_32S: r = "32S"; break;
+	case CV_32F: r = "32F"; break;
+	case CV_64F: r = "64F"; break;
+	default:     r = "User"; break;
+	}
+
+	r += "C";
+	r += (chans + '0');
+
+	return r;
+}
+
 void captureVideo(){
 	VideoCapture cap(0); // open the default camera
 	if (!cap.isOpened())  // check if we succeeded
@@ -34,7 +58,7 @@ void captureVideo(){
 		cap >> frame; // get a new frame from camera
 		unsigned char* dataMat = frame.data;
 		printf("%d", frame.rows);
-		cvtColor(frame, edges, COLOR_BGR2GRAY);
+		//cvtColor(frame, edges, COLOR_BGR2GRAY);
 		GaussianBlur(edges, edges, Size(7, 7), 1.5, 1.5);
 		Canny(edges, edges, 0, 30, 3);
 		imshow("THIS IS A TEST", edges);
@@ -48,28 +72,40 @@ Mat captureVideo(int iResult, SOCKET ConnectSocket, char *sendbuf){
 	if (!cap.isOpened())  // check if we succeeded
 		printf("Failed");
 
-	Mat edges;
-	unsigned char* dataMat;
+	Mat kluge;
+	char * dataMat;
+	Mat frame;
 	//namedWindow("edges", 1);
 	for (;;)
 	{
-		Mat frame;
+		
 		cap >> frame; // get a new frame from camera
-		frame = (frame.reshape(0, 1));
+		cvtColor(frame, kluge, CV_BGR2BGRA);
+		dataMat = (char *)frame.data;
+		printf("Frame: COL: %d, ROW: %d", frame.cols, frame.rows);
+		String ty = type2str(frame.type());
+		///printf("Matrix: %s %dx%d \n", ty.c_str(), frame.rows, frame.cols);
+		cv::Mat kluge(480,640, CV_8UC4, (char *)frame.data);
+		
+		String tya = type2str(kluge.type());
+		printf("kuge: %s %dx%d \n", tya.c_str(), kluge.cols, kluge.rows);
+		//dataMat = (unsigned char *)kluge.data;
+		//frame = (frame.reshape(0, 1));*/
 		int imgSize = frame.total()*frame.elemSize();
-		dataMat = frame.data;
-		/*
-		cvtColor(frame, edges, COLOR_BGR2GRAY);
-		GaussianBlur(edges, edges, Size(7, 7), 1.5, 1.5);
+		
+		
+		/*GaussianBlur(edges, edges, Size(7, 7), 1.5, 1.5);
 		Canny(edges, edges, 0, 30, 3);
 		*/
 		//char *sendbuf = const_cast<char *> (dataMat.toString().c_str());
-		iResult = send(ConnectSocket, (char*)frame.data, imgSize, 0);
+		iResult = send(ConnectSocket, (char *)kluge.data, DEFAULT_BUFLEN, 0);
+
 		if (iResult == SOCKET_ERROR) {
 			printf("send failed with error: %d\n", WSAGetLastError());
 			closesocket(ConnectSocket);
 			WSACleanup();
 		}
+		cvWaitKey(10);
 		//sendData(iResult, ConnectSocket, frame.data, edges);
 	}
 }

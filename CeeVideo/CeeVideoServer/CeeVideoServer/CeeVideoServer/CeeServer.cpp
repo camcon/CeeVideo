@@ -28,6 +28,28 @@ void play_video(Mat frame){
 }
 
 
+String type2str(int type) {
+	String r;
+
+	uchar depth = type & CV_MAT_DEPTH_MASK;
+	uchar chans = 1 + (type >> CV_CN_SHIFT);
+
+	switch (depth) {
+	case CV_8U:  r = "8U"; break;
+	case CV_8S:  r = "8S"; break;
+	case CV_16U: r = "16U"; break;
+	case CV_16S: r = "16S"; break;
+	case CV_32S: r = "32S"; break;
+	case CV_32F: r = "32F"; break;
+	case CV_64F: r = "64F"; break;
+	default:     r = "User"; break;
+	}
+
+	r += "C";
+	r += (chans + '0');
+
+	return r;
+}
 int __cdecl main(void)
 {
 	printf("Server starting\n");
@@ -105,12 +127,19 @@ int __cdecl main(void)
 
 
 	// Receive until the peer shuts down the connection
-	
+	Mat myMat;
 	do {
 		iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-		unsigned char* dataMat = (unsigned char*)recvbuf;
+		uchar* dataMat = (uchar*)recvbuf;
+		cv::Mat outputMat;
 		
-		cv::Mat my_mat(480, 640, CV_8UC1, dataMat);
+		cv::Mat my_mat(480,640, CV_8UC1, dataMat);
+		
+
+		//my_mat.convertTo(my_mat, CV_8UC1);
+		String ty = type2str(my_mat.type());
+		printf("Matrix: %s %dx%d \n", ty.c_str(), my_mat.cols, my_mat.rows);
+		//cv::Mat my_mat(480 * 640, 1, CV_32FC1, dataMat);
 		play_video(my_mat);
 		
 		if (iResult > 0) {
